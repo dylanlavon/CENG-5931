@@ -1,6 +1,6 @@
 import numpy as np
 import dimod
-from dwave.system import DWaveSampler
+import time
 
 def create_qubo(sudoku_grid):
     num_rows, num_cols = sudoku_grid.shape
@@ -8,7 +8,7 @@ def create_qubo(sudoku_grid):
     num_variables = num_rows * num_cols * num_numbers
 
     Q = np.zeros((num_variables, num_variables))
-    c = np.zeros(num_variables)
+    c = 0.0
 
     # Each cell contains exactly one number
     for i in range(num_rows):
@@ -46,30 +46,21 @@ def create_qubo(sudoku_grid):
             if sudoku_grid[i, j] != 0:
                 for k in range(num_numbers):
                     if k + 1 != sudoku_grid[i, j]:
-                        c[i * num_cols * num_numbers + j * num_numbers + k] = 1000
-                    else:
-                        c[i * num_cols * num_numbers + j * num_numbers + k] = -2000
+                        Q[i * num_cols * num_numbers + j * num_numbers + k, i * num_cols * num_numbers + j * num_numbers + k] = 1000
 
-    return Q, c
+    return Q
 
 def solve_qubo(Q):
     bqm = dimod.BQM.from_qubo(Q)
-    sampler = DWaveSampler()
-    response = sampler.sample(bqm)
-    sampleset = response.sampleset
+    sampler = dimod.SimulatedAnnealingSampler()
+    response = sampler.sample(bqm, num_reads=1000)
 
     # Convert sampleset to sudoku grid
-    sudoku_grid = np.zeros((4, 4), dtype=int)
-    for sample in sampleset.record:
-        grid = np.zeros((4, 4), dtype=int)
-        for i in range(4):
-            for j in range(4):
-                for k in range(4):
-                    if sample[i * 4 * 4 + j * 4 + k] == 1:
-                        grid[i, j] = k + 1
-        sudoku_grid = grid
-
+    best_sample = response.record[0]
+    print(best_sample)
     return sudoku_grid
+
+start_time = time.time()
 
 # Initial grid
 sudoku_grid = np.array([[1, 0, 3, 0],
@@ -77,8 +68,8 @@ sudoku_grid = np.array([[1, 0, 3, 0],
                         [0, 0, 0, 4],
                         [0, 1, 0, 0]])
 
-Q, c = create_qubo(sudoku_grid)
+Q = create_qubo(sudoku_grid)
 solution = solve_qubo(Q)
 
-print("Solution:")
-print(solution)
+end_time = time.time()
+print(f"QUBO solver elapsed time: {(end_time - start_time):.4f} seconds")
