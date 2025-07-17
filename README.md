@@ -42,6 +42,25 @@ Execute the script by running
 python game_theory.py
 ```
 
+## Using D-Wave's Maze Solver
+
+<img width="688" height="555" alt="image" src="https://github.com/user-attachments/assets/cb63f1e2-83f5-4f07-807e-23c9403fb5ed" />
+
+D-Wave has previously published a demo showing how their Ocean SDK and their hardware can be used to
+solve mazes using quantum computing. However, their code relies on having an API key to use their
+physical quantum hardware. To get around this, I have created a fork of their repo, and updated it
+to use the simulated annealer from another one of their packages, **dimod**.
+
+The file **demo.py** contains the variables to configure when running the script. _n_rows_ and 
+_n_cols_ defines the width and height of the maze. _start_, _end_, and _walls_ are all definitions
+for _edges_ of cells. They are strings with the format "<row>,<col><direction>". _direction_ 
+indicates either the _n_ (north) or _w_ (west) edge of the cell.
+
+Execute the script (from within the **maze** subdirectory) by running
+```
+python demo.py
+```
+
 ## Using sudoku.py
 
 While this is less applicable to path finding, it is still a good demonstration of utilizing QUBOs.
