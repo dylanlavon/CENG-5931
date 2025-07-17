@@ -11,6 +11,8 @@ applications.
 
 ### Firstly, ensure you have the prerequisite python packages before running any of the scripts.
 
+Ensure you run this from within the root of the repository.
+
 ```
 pip install requirements.txt
 ```
